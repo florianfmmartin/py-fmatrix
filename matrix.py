@@ -94,3 +94,7 @@ class Matrix:
         if current_row != self.last_row:
             sleep(self.frame)
             self.change_next_row(upper_random_columns, current_row)
+
+
+class Square(Matrix):
+    pass
