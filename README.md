@@ -1,2 +1,2 @@
 # py-fmatrix
-A matrix-like animation written in pyhton
+A matrix-like animation written in pyhton.
