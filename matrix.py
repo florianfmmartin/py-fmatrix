@@ -2,9 +2,9 @@
 
 # imports
 import tkinter as tk
-from character import Character
 from time import sleep
 from random import choice
+from kanji import kanji_list
 
 
 class Matrix:
@@ -96,5 +96,23 @@ class Matrix:
             self.change_next_row(upper_random_columns, current_row)
 
 
-class Square(Matrix):
-    pass
+class Character(Matrix):
+    # initialisation
+    def __init__(self, pos_x, pos_y):
+        self.pos_x = pos_x
+        self.pos_y = pos_y
+        self.kanji = tk.StringVar()
+        self.label = None
+        self.opacity = 6
+        self.opacity_dict = {0: "#00d8dee9",
+                             1: "#24d8dee9",
+                             2: "#6bd8dee9",
+                             3: "#8fd8dee9",
+                             4: "#b3d8dee9",
+                             5: "#d6d8dee9",
+                             6: "#ffd8dee9",
+                             }
+
+    def set_kanji(self):
+        self.kanji.set(choice(kanji_list))
+
