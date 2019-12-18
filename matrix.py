@@ -1,118 +1,132 @@
-# matrix.py
-
 # imports
 import tkinter as tk
-from time import sleep
 from random import choice
+from time import sleep
 from kanji import kanji_list
 
 
 class Matrix:
-    # initialisation
+    # init
     def __init__(self):
-        # window
+        # init
         self.window = tk.Tk()
         self.window.title("py-fmatrix")
-        self.width = 595
-        self.height = 400
+        self.width = 1600
+        self.height = 900
         self.window.geometry(f"{self.width}x{self.height}")
-        self.window.attributes('-type', 'dialog')
+        self.window.attributes("-type", "dialog")
+        self.char_size_x = 16
+        self.char_size_y = 19
+        self.chars = []
+        self.x_list = []
+        self.y_list = []
+        self.last_row = self.height // self.char_size_y
+        self.five_last = [self.last_row - 5, self.last_row - 4, self.last_row - 3, self.last_row - 2, self.last_row - 1, self.last_row]
+        self.init_chars()
+        self.top_row_numb = 3
 
-        # other params
-        self.number_of_columns = 6
-        self.full_opacity = 6
-        self.random_columns = []
-        self.frame = 1 / 10
+        # loop
+        self.window.bind("<Return>", self.start)
+        self.window.mainloop()
 
-        # single character size
-        self.character_size_h = 16
-        self.character_size_v = 19
+    def init_chars(self):
+        for x in range(0, self.width // self.char_size_x):
+            self.x_list.append(x)
+        for y in range(0, self.height // self.char_size_y):
+            self.y_list.append(y)
 
-        # list of possible positions
-        self.pos_x = []
-        self.pos_y = []
-        for x in range(0, self.width // self.character_size_h):
-            self.pos_x.append(x)
-        for y in range(0, self.height // self.character_size_v):
-            self.pos_y.append(y)
-        self.last_row = self.pos_y[-1]
+        for x in self.x_list:
+            column_list = []
+            for y in self.y_list:
+                char = Char(x, y, self)
+                column_list.append(char)
+            self.chars.append(column_list)
 
-        # matrix of all characters
-        self.characters = []
-        for y in self.pos_y:
-            row_list = []
-            for x in self.pos_x:
-                character_matrix = Character(x, y)
-                row_list.append(character_matrix)
-                character_matrix.kanji = tk.StringVar()
-                character_matrix.set_kanji()
-                character_matrix.label = tk.Label(self.window, text=character_matrix.kanji.get())
-                character_matrix.label.grid(column=character_matrix.pos_x, row=character_matrix.pos_y)
-            self.characters.append(row_list)
-
-        # show window
+    def start(self, event):
+        print(f"hit -- {event}")
+        self.top_row()
+        sleep(0.03)
+        self.char_scan()
         self.window.update()
-        while True:
-            sleep(0.1)
-            chosen = self.characters[choice(self.pos_y)][choice(self.pos_x)]
-            chosen.set_kanji()
-            chosen.label.grid(column=chosen.pos_x, row=chosen.pos_y)
-            self.window.update()
+        self.start(None)
 
-    def change_top_row(self):
-        self.random_columns = []
-        this_row = 0
-        # what columns do i change
-        for column in range(0, self.number_of_columns):
-            self.random_columns.append(choice(self.pos_x))
-        # for each of those columns
-        for chosen_column in self.random_columns:
-            chosen_character = self.characters[this_row][chosen_column]
-            chosen_character.set_kanji()
-            chosen_character.opacity = self.full_opacity
+    def top_row(self):
+        top_row_list = []
+        for x in self.x_list:
+            char_of_top = self.chars[x][0]
+            if char_of_top.opacity == 6:
+                top_row_list.append(char_of_top)
 
-        # then we change next row
-        self.change_next_row(self.random_columns, this_row)
+        if len(top_row_list) < self.top_row_numb:
+            for times in range(0, self.top_row_numb - len(top_row_list)):
+                rand_top_char = self.chars[choice(self.x_list)][0]
+                rand_top_char.opacity = 6
+                rand_top_char.set_kanji()
+                rand_top_char.set_opacity()
 
-        # sleep then change top
-        sleep(1)
-        self.change_top_row()
+    def char_scan(self):
+        char_on_screen = []
+        for x in self.x_list:
+            for y in self.y_list:
+                char = self.chars[x][y]
+                if char.opacity == 6:
+                    char_on_screen.append(char)
 
-    def change_next_row(self, upper_random_columns, upper_row):
-        current_row = upper_row + 1
-        for column in upper_random_columns:
-            self.characters[current_row][column].set_kanji()
-            self.characters[current_row][column].opacity = self.full_opacity
-
-        for column in upper_random_columns:
-            up_row = upper_row
-            for elements in range(0, self.full_opacity + 1):
-                if self.characters[up_row][column].opacity != 0:
-                    self.characters[up_row][column].opacity -= 1
-                up_row -= 1
-
-        if current_row != self.last_row:
-            sleep(self.frame)
-            self.change_next_row(upper_random_columns, current_row)
+        for char in char_on_screen:
+            self.char_change(char.pos_x, char.pos_y)
 
 
-class Character(Matrix):
-    # initialisation
-    def __init__(self, pos_x, pos_y):
-        self.pos_x = pos_x
-        self.pos_y = pos_y
-        self.kanji = tk.StringVar()
-        self.label = None
-        self.opacity = 6
-        self.opacity_dict = {0: "#00d8dee9",
-                             1: "#24d8dee9",
-                             2: "#6bd8dee9",
-                             3: "#8fd8dee9",
-                             4: "#b3d8dee9",
-                             5: "#d6d8dee9",
-                             6: "#ffd8dee9",
-                             }
+    def char_change(self, x, y):
+        try:
+            next_char = self.chars[x][y+1]
+            next_char.set_kanji()
+            next_char.opacity = 6
+            next_char.set_opacity()
+        except:
+            print("n")
+
+        try:
+            present_char = self.chars[x][y]
+            present_char.opacity -= 1
+            present_char.set_opacity()
+        except:
+            print("p")
+
+        for upper in range(1, 6):
+            try:
+                if y - upper >= 0:
+                    up_char = self.chars[x][y - upper]
+                    if up_char.opacity > 0:
+                        up_char.opacity -= 1
+                    up_char.set_opacity()
+            except:
+                print("u")
+
+
+class Char:
+    # init
+    def __init__(self, x, y, master):
+        self.pos_x = x
+        self.pos_y = y
+        self.master = master
+        self.kanji = "罪"
+        self.opacity = 0
+        self.dict = {0: "#3B4252",
+                     1: "#434C5E",
+                     2: "#4C556A",
+                     3: "#D8DEE9",
+                     4: "#E5E9F0",
+                     5: "#ECEFF4",
+                     6: "#A3BE8C"}
+        self.label = tk.Label(self.master.window, text=self.kanji, fg="#A3BE8C")
+        if self.pos_y not in self.master.five_last:
+            self.label.grid(column=self.pos_x, row=self.pos_y)
+        self.set_kanji()
+        self.set_opacity()
 
     def set_kanji(self):
-        self.kanji.set(choice(kanji_list))
+        self.kanji = choice(kanji_list)
+        self.label["text"] = self.kanji
 
+    def set_opacity(self):
+        self.label["fg"] = self.dict[self.opacity]
