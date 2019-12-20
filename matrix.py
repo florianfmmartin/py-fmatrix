@@ -11,8 +11,8 @@ class Matrix:
         # init
         self.window = tk.Tk()
         self.window.title("py-fmatrix")
-        self.width = 1600
-        self.height = 900
+        self.width = 800
+        self.height = 600
         self.window.geometry(f"{self.width}x{self.height}")
         self.window.attributes("-type", "dialog")
         self.char_size_x = 16
@@ -27,6 +27,7 @@ class Matrix:
 
         # loop
         self.window.bind("<Return>", self.start)
+        self.window.geometry(f"{self.width}x{self.height - (5 * self.char_size_y)}")
         self.window.mainloop()
 
     def init_chars(self):
@@ -45,7 +46,7 @@ class Matrix:
     def start(self, event):
         print(f"hit -- {event}")
         self.top_row()
-        sleep(0.03)
+        sleep(0.06)
         self.char_scan()
         self.window.update()
         self.start(None)
