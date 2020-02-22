@@ -11,8 +11,8 @@ class Matrix:
         # init
         self.window = tk.Tk()
         self.window.title("py-fmatrix")
-        self.width = 800
-        self.height = 600
+        self.width = 600
+        self.height = 400
         self.window.geometry(f"{self.width}x{self.height}")
         self.window.attributes("-type", "dialog")
         self.char_size_x = 16
@@ -44,7 +44,7 @@ class Matrix:
             self.chars.append(column_list)
 
     def start(self, event):
-        print(f"hit -- {event}")
+        # print(f"hit -- {event}")
         self.top_row()
         sleep(0.06)
         self.char_scan()
@@ -84,14 +84,16 @@ class Matrix:
             next_char.opacity = 6
             next_char.set_opacity()
         except:
-            print("n")
+            # print("n")
+            pass
 
         try:
             present_char = self.chars[x][y]
             present_char.opacity -= 1
             present_char.set_opacity()
         except:
-            print("p")
+            # print("p")
+            pass
 
         for upper in range(1, 6):
             try:
@@ -101,7 +103,8 @@ class Matrix:
                         up_char.opacity -= 1
                     up_char.set_opacity()
             except:
-                print("u")
+                # print("u")
+                pass
 
 
 class Char:
@@ -112,13 +115,13 @@ class Char:
         self.master = master
         self.kanji = "罪"
         self.opacity = 0
-        self.dict = {0: "#3B4252",
-                     1: "#434C5E",
-                     2: "#4C556A",
-                     3: "#D8DEE9",
-                     4: "#E5E9F0",
-                     5: "#ECEFF4",
-                     6: "#A3BE8C"}
+        self.dict = {0: "#282828",
+                     1: "#3C3836",
+                     2: "#504945",
+                     3: "#665C54",
+                     4: "#7C6F64",
+                     5: "#928374",
+                     6: "#EBDBB2"}
         self.label = tk.Label(self.master.window, text=self.kanji, fg="#A3BE8C")
         if self.pos_y not in self.master.five_last:
             self.label.grid(column=self.pos_x, row=self.pos_y)
